@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siwangi Pokharel | Geomatics Engineering Student</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --forest: #1a3a2a;
+    --moss: #2d5a3d;
+    --fern: #4a7c59;
+    --sage: #7aab8a;
+    --mist: #b8d4c0;
+    --cream: #f5f0e8;
+    --parchment: #ede7d9;
+    --gold: #c9a84c;
+    --amber: #e8b84b;
+    --ink: #1a1a14;
+    --charcoal: #2e2e26;
+    --ash: #6b6b5e;
+    --white: #fdfcf8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--ink);
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    background: rgba(26,26,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links { display: flex; gap: 2.5rem; }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-decoration: none;
+    transition: color 0.3s;
+    padding: 0.3rem 0;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--amber);
+    transition: width 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--amber); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ─── HERO ─── */
+  #home {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(45,90,61,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,168,76,0.08) 0%, transparent 60%);
+  }
+
+  .hero-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(184,212,192,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(184,212,192,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 3rem 4rem 5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background: var(--sage);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    font-weight: 300;
+    line-height: 1.0;
+    color: var(--white);
+    margin-bottom: 0.2rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--mist);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-desc {
+    font-size: 0.9rem;
+    color: var(--ash);
+    line-height: 1.8;
+    max-width: 440px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 3rem;
+  }
+
+  .hero-contacts a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--mist);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: color 0.3s;
+  }
+
+  .hero-contacts a:hover { color: var(--amber); }
+
+  .contact-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--sage);
+    flex-shrink: 0;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+
+
+  .btn-primary:hover {
+    background: var(--amber);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--mist);
+    border: 1px solid rgba(184,212,192,0.3);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--sage);
+    color: var(--sage);
+    transform: translateY(-2px);
+  }
+
+  .hero-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    padding: 8rem 4rem 4rem 2rem;
+  }
+
+  .photo-frame {
+    position: relative;
+  }
+
+  .photo-frame::before {
+    content: '';
+    position: absolute;
+    top: -12px; left: -12px;
+    width: 100%; height: 100%;
+    border: 1px solid var(--gold);
+    opacity: 0.4;
+  }
+
+  .photo-frame::after {
+    content: '';
+    position: absolute;
+    top: 12px; left: 12px;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(45,90,61,0.3), transparent);
+  }
+
+.profile-photo {
+  width: 340px;
+  height: 420px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  position: relative;
+  z-index: 1;
+  filter: sepia(15%) contrast(1.05);
+}
+
+  .photo-placeholder {
+    width: 340px;
+    height: 420px;
+    background: linear-gradient(135deg, var(--forest), var(--moss));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .photo-initials {
+    font-size: 5rem;
+    font-weight: 300;
+    color: var(--amber);
+    font-style: italic;
+  }
+
+  .photo-name-small {
+    font-size: 0.8rem;
+    color: var(--mist);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+  }
+
+  .stat-chips {
+    position: absolute;
+    bottom: -2rem;
+    left: -2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 3;
+  }
+
+  .stat-chip {
+    background: var(--charcoal);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ash);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 6rem 5rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .section-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--sage);
+    letter-spacing: 0.2em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(122,171,138,0.4), transparent);
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  h2 em { color: var(--amber); font-style: italic; }
+
+  /* ─── ABOUT / CV ─── */
+  #cv { background: var(--charcoal); }
+
+  .cv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 4rem;
+  }
+
+  /* ─── SKILLS ─── */
+  .skills-column h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--mist);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .skill-category {
+    margin-bottom: 2.5rem;
+  }
+
+  .skill-cat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .skill-cat-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(122,171,138,0.25);
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skill-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(45,90,61,0.3);
+    border: 1px solid rgba(122,171,138,0.2);
+    color: var(--mist);
+    letter-spacing: 0.05em;
+    transition: all 0.25s;
+  }
+
+  .skill-tag:hover {
+    background: rgba(45,90,61,0.6);
+    border-color: var(--sage);
+    color: var(--white);
+    transform: translateY(-1px);
+  }
+
+  .skill-tag.featured {
+    background: rgba(201,168,76,0.15);
+    border-color: rgba(201,168,76,0.35);
+    color: var(--amber);
+  }
+
+  /* ─── TIMELINE ─── */
+  .timeline-column h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--mist);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .timeline { position: relative; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--sage), transparent);
+  }
+
+  .timeline-item {
+    padding-left: 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0.4rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  }
+
+  .timeline-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--sage);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.2rem;
+  }
+
+  .timeline-org {
+    font-size: 0.8rem;
+    color: var(--amber);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.8rem;
+    color: var(--ash);
+    line-height: 1.65;
+  }
+
+  /* ─── AWARDS ─── */
+  #awards {
+    background: var(--ink);
+  }
+
+  .awards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .award-card {
+    border: 1px solid rgba(122,171,138,0.15);
+    padding: 2rem;
+    background: rgba(45,90,61,0.08);
+    transition: all 0.35s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .award-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.35s;
+  }
+
+  .award-card:hover {
+    background: rgba(45,90,61,0.18);
+    border-color: rgba(122,171,138,0.35);
+    transform: translateY(-3px);
+  }
+
+  .award-card:hover::before { transform: scaleY(1); }
+
+  .award-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 0.8rem;
+  }
+
+  .award-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+
+  .award-body {
+    font-size: 0.78rem;
+    color: var(--ash);
+    line-height: 1.6;
+  }
+
+  /* ─── GIS DASHBOARD ─── */
+  #gis {
+    background: var(--charcoal);
+    padding-top: 6rem;
+  }
+
+  .gis-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    align-items: end;
+  }
+
+  .gis-desc {
+    font-size: 0.9rem;
+    color: var(--ash);
+    line-height: 1.8;
+    margin-top: 1rem;
+  }
+
+  .gis-tech-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .tech-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.9rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    background: rgba(201,168,76,0.06);
+  }
+
+  .dashboard-container {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    border: 1px solid rgba(122,171,138,0.2);
+    overflow: hidden;
+  }
+
+  .dashboard-header {
+    background: rgba(26,58,42,0.8);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(122,171,138,0.15);
+  }
+
+  .dashboard-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .db-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .db-dot.red { background: #ff5f57; }
+  .db-dot.yellow { background: #febc2e; }
+  .db-dot.green { background: #28c840; }
+
+  .db-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--sage);
+    letter-spacing: 0.15em;
+  }
+
+  .db-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .db-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.25rem 0.7rem;
+    background: transparent;
+    border: 1px solid rgba(122,171,138,0.3);
+    color: var(--sage);
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .db-btn:hover, .db-btn.active {
+    background: rgba(122,171,138,0.15);
+    color: var(--mist);
+  }
+
+  .dashboard-body {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    height: 580px;
+  }
+
+  #map {
+    height: 100%;
+    background: #0d1f14;
+  }
+
+  .sidebar {
+    background: rgba(26,26,20,0.95);
+    border-left: 1px solid rgba(122,171,138,0.15);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar-section {
+    padding: 1.2rem;
+    border-bottom: 1px solid rgba(122,171,138,0.1);
+  }
+
+  .sidebar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--sage);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .info-panel {
+    background: rgba(45,90,61,0.12);
+    border: 1px solid rgba(122,171,138,0.15);
+    padding: 0.9rem;
+    min-height: 100px;
+  }
+
+  .info-default {
+    font-size: 0.78rem;
+    color: var(--ash);
+    font-style: italic;
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+
+  .info-province-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(122,171,138,0.1);
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ash);
+    letter-spacing: 0.1em;
+  }
+
+  .info-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--mist);
+    font-weight: 500;
+  }
+
+  .info-val.highlight { color: var(--amber); }
+
+  .legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .legend-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ash);
+  }
+
+  .sidebar-stats {
+    padding: 1.2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .mini-stat {
+    text-align: center;
+    padding: 0.8rem;
+    background: rgba(45,90,61,0.1);
+    border: 1px solid rgba(122,171,138,0.1);
+  }
+
+  .mini-stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--amber);
+    display: block;
+  }
+
+  .mini-stat-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--ash);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink);
+    padding: 3rem 5rem;
+    border-top: 1px solid rgba(122,171,138,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ash);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── LEAFLET OVERRIDES ─── */
+  .leaflet-control-zoom {
+    border: 1px solid rgba(122,171,138,0.3) !important;
+    background: rgba(26,26,20,0.9) !important;
+  }
+
+  .leaflet-control-zoom a {
+    background: transparent !important;
+    color: var(--sage) !important;
+    border: none !important;
+  }
+
+  .leaflet-control-zoom a:hover {
+    background: rgba(122,171,138,0.15) !important;
+    color: var(--mist) !important;
+  }
+
+  .leaflet-control-attribution {
+    background: rgba(26,26,20,0.8) !important;
+    color: var(--ash) !important;
+    font-size: 0.55rem !important;
+  }
+
+  .leaflet-control-attribution a { color: var(--sage) !important; }
+
+  /* custom info control */
+  .leaflet-info-control {
+    display: none; /* handled in sidebar */
+  }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    #home { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .cv-grid { grid-template-columns: 1fr; }
+    .gis-intro { grid-template-columns: 1fr; }
+    .awards-grid { grid-template-columns: 1fr 1fr; }
+    .dashboard-body { grid-template-columns: 1fr; height: auto; }
+    .sidebar { height: 300px; }
+    section { padding: 4rem 1.5rem; }
+    nav { padding: 1rem 1.5rem; }
+    .hero-left { padding: 7rem 1.5rem 3rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+
+  /* ─── TABS ─── */
+  .tab-btns {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(122,171,138,0.2);
+  }
+
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.4rem;
+    background: transparent;
+    border: none;
+    color: var(--ash);
+    cursor: pointer;
+    transition: all 0.25s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn:hover { color: var(--mist); }
+
+  .tab-btn.active {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+
+  /* Trek tooltip */
+  .trek-tooltip {
+    background: rgba(26,26,20,0.95) !important;
+    border: 1px solid rgba(201,168,76,0.4) !important;
+    color: var(--mist) !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.68rem !important;
+    padding: 0.4rem 0.7rem !important;
+    box-shadow: none !important;
+  }
+  .trek-tooltip::before { display:none !important; }
+  .leaflet-tooltip-left.trek-tooltip::before,
+  .leaflet-tooltip-right.trek-tooltip::before { display:none !important; }
+
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">S. Pokharel</div>
+  <div class="nav-links">
+    <a href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})">Home</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('cv').scrollIntoView({behavior:'smooth'})">Profile</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('awards').scrollIntoView({behavior:'smooth'})">Awards</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('gis').scrollIntoView({behavior:'smooth'})">WebGIS</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-overlay"></div>
+
+  <div class="hero-left reveal">
+    <div class="hero-tag">Geomatics Engineering Student · Nepal</div>
+    <h1>Siwangi<br><em>Pokharel</em></h1>
+    <p class="hero-desc">
+      Undergraduate Geomatics Engineering student at Kathmandu University with a strong foundation in GIS, remote sensing, and humanitarian open mapping. OSM Guru · Climate Resilience Mapper · SotM 2025 Grantee.
+    </p>
+    <div class="hero-contacts">
+      <a href="mailto:siwangi37@gmail.com"><span class="contact-dot"></span>siwangi37@gmail.com</a>
+      <a href="tel:+9779746292895"><span class="contact-dot"></span>+977-9746292895</a>
+      <a href="https://linkedin.com/in/siwangi-p-460814271" target="_blank"><span class="contact-dot"></span>linkedin.com/in/siwangi-p-460814271</a>
+    </div>
+    <div class="hero-btns">
+      <a href="javascript:void(0)" class="btn btn-primary" onclick="document.getElementById('cv').scrollIntoView({behavior:'smooth'})">View Profile</a>
+      <a href="javascript:void(0)" class="btn btn-outline" onclick="document.getElementById('gis').scrollIntoView({behavior:'smooth'})">WebGIS Dashboard</a>
+    </div>
+  </div>
+
+  <div class="hero-right reveal" style="transition-delay:0.2s">
+    <div class="photo-frame">
+      <!-- Photo placeholder styled as artistic portrait -->
+      <div class="photo-frame">
+
+  <img
+    src="siwangi.jpg"
+    alt="Siwangi Pokharel"
+    class="profile-photo"
+    onerror="this.style.display='none'; document.getElementById('photo-fallback').style.display='flex';"
+  >
+
+  <div
+    id="photo-fallback"
+    class="photo-placeholder"
+    style="display:none;"
+  >
+    <span class="photo-initials">SP</span>
+    <span class="photo-name-small">Siwangi Pokharel</span>
+  </div>
+
+  <div class="stat-chips">
+    <div class="stat-chip">
+      <span class="stat-number">356K+</span>
+      <span class="stat-label">OSM<br>Edits</span>
+    </div>
+
+    <div class="stat-chip">
+      <span class="stat-number">433</span>
+      <span class="stat-label">Mapping<br>Days</span>
+    </div>
+  </div>
+
+</div>
+  </div>
+</section>
+
+<!-- ─── CV SECTION ─── -->
+<section id="cv">
+  <div class="section-header">
+    <span class="section-number">01 —</span>
+    <h2>Professional <em>Profile</em></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="cv-grid">
+    <!-- SKILLS -->
+    <div class="skills-column reveal">
+      <h3>Technical Skills</h3>
+
+      <div class="skill-category">
+        <div class="skill-cat-label">GIS &amp; Remote Sensing</div>
+        <div class="skill-tags">
+          <span class="skill-tag featured">ArcGIS</span>
+          <span class="skill-tag featured">QGIS</span>
+          <span class="skill-tag featured">Google Earth Engine</span>
+          <span class="skill-tag">JOSM</span>
+          <span class="skill-tag">Pix4Dmapper</span>
+          <span class="skill-tag">UAV Photogrammetry</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <div class="skill-cat-label">Web &amp; Mapping Platforms</div>
+        <div class="skill-tags">
+          <span class="skill-tag featured">OpenStreetMap</span>
+          <span class="skill-tag featured">HOT Tasking Manager</span>
+          <span class="skill-tag">MapRoulette</span>
+          <span class="skill-tag">Map Swipe</span>
+          <span class="skill-tag">fAIr</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <div class="skill-cat-label">Programming</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">C / C++</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <div class="skill-cat-label">Analytical &amp; Data</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Spatial Analysis</span>
+          <span class="skill-tag">Vector Data Creation</span>
+          <span class="skill-tag">Photogrammetry</span>
+          <span class="skill-tag">Microsoft Office Suite</span>
+          <span class="skill-tag">Canva</span>
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <div class="skill-cat-label">Domains</div>
+        <div class="skill-tags">
+          <span class="skill-tag featured">Humanitarian Mapping</span>
+          <span class="skill-tag featured">Disaster Risk Reduction</span>
+          <span class="skill-tag">Climate Resilience</span>
+          <span class="skill-tag">Food Systems</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE TABBED -->
+    <div class="timeline-column reveal" style="transition-delay:0.15s">
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="switchTab('education', this)">Education</button>
+        <button class="tab-btn" onclick="switchTab('projects', this)">Projects &amp; Experience</button>
+      </div>
+
+      <!-- EDUCATION TAB -->
+      <div id="tab-education" class="tab-panel active">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2022 – PRESENT</div>
+            <div class="timeline-title">B.E. Geomatics Engineering</div>
+            <div class="timeline-org">Kathmandu University, Dhulikhel, Kavre</div>
+            <div class="timeline-desc">Core coursework: GIS, Remote Sensing, Photogrammetry, Spatial Data Infrastructure, and Machine Learning for spatial analysis.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2019 – 2021</div>
+            <div class="timeline-title">Higher Secondary Education (Science Stream)</div>
+            <div class="timeline-org">Global School of Science, Kathmandu</div>
+            <div class="timeline-desc">Physics, Chemistry, Mathematics, Computer Science.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2007 – 2018</div>
+            <div class="timeline-title">Secondary School Education (SEE)</div>
+            <div class="timeline-org">Roshani English Boarding School, Syangja, Nepal</div>
+            <div class="timeline-desc">Foundation education through Secondary Education Examination.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS TAB -->
+      <div id="tab-projects" class="tab-panel" style="display:none">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2026 – PRESENT</div>
+            <div class="timeline-title">Food System Challenge — Grant Recipient (€1,000)</div>
+            <div class="timeline-org">Competitive International Grant · Nepal Team</div>
+            <div class="timeline-desc">Conducting geospatial and data-driven research addressing food system sustainability in Nepal; serving as project treasurer.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">PRESENT</div>
+            <div class="timeline-title">BFPQA Intern — Building Footprint Digitization</div>
+            <div class="timeline-org">WHO-Funded Project</div>
+            <div class="timeline-desc">Systematic digitization of building footprints for spatial data infrastructure supporting health and disaster response planning.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2025</div>
+            <div class="timeline-title">State of the Map Conference — Grant Recipient (£750)</div>
+            <div class="timeline-org">Philippines · International OSM Conference</div>
+            <div class="timeline-desc">Selected from Nepal to attend the premier OpenStreetMap conference; engaged with global geospatial community leaders.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024 – PRESENT</div>
+            <div class="timeline-title">OSM Guru &amp; Humanitarian Mapping Volunteer</div>
+            <div class="timeline-org">Humanitarian OpenStreetMap Team (HOT)</div>
+            <div class="timeline-desc">356,122+ map edits over 433 days; completing 1,000+ tasks and validating 500+ tasks. Top Quality Mapper across Humla, Jumla &amp; Dolpa districts.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024 – 2025</div>
+            <div class="timeline-title">Executive Member — Geomatics Engineering Society</div>
+            <div class="timeline-org">Kathmandu University</div>
+            <div class="timeline-desc">Departmental leadership role contributing to student initiatives and events in geomatics.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024 – PRESENT</div>
+            <div class="timeline-title">General Member — ISPRS</div>
+            <div class="timeline-org">International Society of Photogrammetry &amp; Remote Sensing</div>
+            <div class="timeline-desc">Active member of the global professional body for photogrammetry, remote sensing, and spatial information sciences.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024</div>
+            <div class="timeline-title">Autumn Sprint Mapathon</div>
+            <div class="timeline-org">Youth Innovation Lab · RAIN Program (UK International Development)</div>
+            <div class="timeline-desc">Digitized two municipalities in Nepal, contributing high-quality geospatial data for disaster risk reduction and community resilience planning.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2023 – 2024</div>
+            <div class="timeline-title">GIS Analyst — Climate Resilience Mapping</div>
+            <div class="timeline-org">HOT / Open Asia Pacific Hub</div>
+            <div class="timeline-desc">Conducted feasibility studies and risk assessments for climate resilience mapping initiatives across the Asia-Pacific region.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── AWARDS ─── -->
+<section id="awards">
+  <div class="section-header">
+    <span class="section-number">02 —</span>
+    <h2>Awards &amp; <em>Recognition</em></h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="awards-grid">
+    <div class="award-card reveal">
+      <div class="award-year">2026</div>
+      <div class="award-title">Food System Challenge Grant</div>
+      <div class="award-body">Team selected from Nepal; received €1,000 competitive grant for geospatial food system research addressing sustainability challenges.</div>
+    </div>
+    <div class="award-card reveal" style="transition-delay:0.1s">
+      <div class="award-year">2025</div>
+      <div class="award-title">State of the Map Conference Grant (£750)</div>
+      <div class="award-body">Selected from Nepal to attend the premier international OpenStreetMap conference in the Philippines, engaging with global geospatial experts.</div>
+    </div>
+    <div class="award-card reveal" style="transition-delay:0.2s">
+      <div class="award-year">2024</div>
+      <div class="award-title">OSM Guru Recognition</div>
+      <div class="award-body">Awarded by the Humanitarian OpenStreetMap Team for sustained high-quality contributions to the global OpenStreetMap community.</div>
+    </div>
+    <div class="award-card reveal" style="transition-delay:0.0s">
+      <div class="award-year">2024</div>
+      <div class="award-title">Top Quality Mapper — "Map Roads, Make Your Way"</div>
+      <div class="award-body">Recognised for excellence in mapping road networks across remote districts of Humla, Jumla, and Dolpa by HOT, Open Asia Pacific Hub, KIRDARC &amp; OSM Nepal.</div>
+    </div>
+    <div class="award-card reveal" style="transition-delay:0.1s">
+      <div class="award-year">2024</div>
+      <div class="award-title">Top Mapper, Advanced Category — Youth Innovation Lab</div>
+      <div class="award-body">Achieved 14,409 map edits including 447 buildings, 207 land-use features, and 140 km of roadways supporting disaster risk reduction in Madhesh Province.</div>
+    </div>
+    <div class="award-card reveal" style="transition-delay:0.2s">
+      <div class="award-year">2023–24</div>
+      <div class="award-title">High-Impact Humanitarian Mapper</div>
+      <div class="award-body">Contributed 356,122+ map edits over 433 days, completing 1,000+ tasks and validating 500+ tasks via HOT Tasking Manager.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WebGIS DASHBOARD ─── -->
+<section id="gis">
+  <div class="section-header">
+    <span class="section-number">03 —</span>
+    <h2>Featured <em>WebGIS</em> Project</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="gis-intro">
+    <div class="reveal">
+      <p class="gis-desc">
+        Interactive WebGIS dashboard combining <strong style="color:var(--amber)">BIPAD Portal hazard overlays</strong>
+        with Nepal's major trekking routes visualised as interactive GeoJSON lines.
+        The choropleth base layer shows tourist density per province. Trekking routes are drawn from
+        real GPS-traced coordinates and styled by difficulty. BIPAD's WMS disaster risk layer
+        highlights flood and landslide hazard zones relevant to trekkers.
+        Hover or click any province or route for full attribute details in the sidebar.
+      </p>
+    </div>
+    <div class="gis-tech-stack reveal" style="transition-delay:0.15s">
+      <span class="tech-pill">Leaflet.js v1.9</span>
+      <span class="tech-pill">BIPAD Portal WMS</span>
+      <span class="tech-pill">Choropleth — Tourist Density</span>
+      <span class="tech-pill">Trekking Routes GeoJSON</span>
+      <span class="tech-pill">Real-time Hover Info Panel</span>
+    </div>
+  </div>
+
+  <div class="dashboard-container reveal">
+    <div class="dashboard-header">
+      <div class="dashboard-title-bar">
+        <div class="db-dot red"></div>
+        <div class="db-dot yellow"></div>
+        <div class="db-dot green"></div>
+        <span class="db-label">Nepal Tourism &amp; Trekking Dashboard · BIPAD Hazard Overlay</span>
+      </div>
+      <div class="db-controls">
+        <button class="db-btn active" id="btn-tourist" onclick="setView('tourist')">Tourist Density</button>
+        <button class="db-btn" id="btn-routes" onclick="setView('routes')">Trekking Routes</button>
+        <button class="db-btn" id="btn-bipad" onclick="toggleBIPAD(this)">BIPAD Hazard</button>
+      </div>
+    </div>
+    <div class="dashboard-body">
+      <div id="map"></div>
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">Info Panel</div>
+          <div id="mini-map-wrap" style="display:none;width:100%;height:130px;margin-bottom:0.7rem;border:1px solid rgba(122,171,138,0.25);overflow:hidden;">
+            <div id="mini-map" style="width:100%;height:100%;"></div>
+          </div>
+          <div class="info-panel" id="info-panel">
+            <div class="info-default">Hover over a province or trekking route</div>
+          </div>
+        </div>
+        <div class="sidebar-section" style="flex-shrink:0">
+          <div class="sidebar-label">Legend</div>
+          <div id="legend-items" style="display:flex;flex-direction:column;gap:0.35rem;margin-top:0.3rem;"></div>
+        </div>
+        <div class="sidebar-stats">
+          <div class="mini-stat">
+            <span class="mini-stat-num">7</span>
+            <span class="mini-stat-lbl">Provinces</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-num">2.9M</span>
+            <span class="mini-stat-lbl">Annual Visitors</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-num">10</span>
+            <span class="mini-stat-lbl">Trek Routes</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-num">48</span>
+            <span class="mini-stat-lbl">Heritage Sites</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-name">Siwangi Pokharel</div>
+  <div class="footer-copy">Geomatics Engineering Student · Kathmandu University · Nepal · 2025</div>
+</footer>
+
+<script>
+// ─── REVEAL ON SCROLL ───
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+revealEls.forEach(el => observer.observe(el));
+
+// ─── TAB SWITCH ───
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('tab-' + name);
+  if (panel) { panel.style.display = 'block'; panel.classList.add('active'); }
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+//  PROVINCE TOURIST DENSITY DATA
+// ─────────────────────────────────────────────
+const provincesGeoJSON = {
+  "type": "FeatureCollection",
+  "features": [
+    { "type":"Feature","properties":{"name":"Koshi Province","province_no":1,"capital":"Biratnagar","tourist_density":42,"annual_visitors":280000,"top_attraction":"Kanchenjunga, Ilam Tea Gardens","trekking_routes":8,"heritage_sites":3,"accommodation_units":420},"geometry":{"type":"Polygon","coordinates":[[[87.0,26.7],[88.2,26.7],[88.2,27.1],[88.0,27.5],[87.8,28.0],[87.5,28.2],[87.0,28.1],[86.7,27.9],[86.5,27.5],[86.7,27.0],[87.0,26.7]]]}},
+    { "type":"Feature","properties":{"name":"Madhesh Province","province_no":2,"capital":"Janakpur","tourist_density":38,"annual_visitors":210000,"top_attraction":"Janaki Temple, Parsa National Park","trekking_routes":2,"heritage_sites":5,"accommodation_units":180},"geometry":{"type":"Polygon","coordinates":[[[85.8,26.4],[87.0,26.4],[87.0,26.7],[86.7,27.0],[86.5,27.0],[85.8,27.0],[85.2,26.9],[84.8,26.7],[84.8,26.4],[85.8,26.4]]]}},
+    { "type":"Feature","properties":{"name":"Bagmati Province","province_no":3,"capital":"Hetauda","tourist_density":312,"annual_visitors":980000,"top_attraction":"Kathmandu Valley, Pashupatinath, Boudhanath","trekking_routes":12,"heritage_sites":19,"accommodation_units":2400},"geometry":{"type":"Polygon","coordinates":[[[84.8,26.7],[85.8,26.7],[85.8,27.0],[85.9,27.5],[86.0,28.0],[85.5,28.3],[85.0,28.0],[84.5,27.8],[84.0,27.5],[84.0,27.0],[84.5,26.8],[84.8,26.7]]]}},
+    { "type":"Feature","properties":{"name":"Gandaki Province","province_no":4,"capital":"Pokhara","tourist_density":285,"annual_visitors":860000,"top_attraction":"Pokhara, Annapurna Circuit, Mustang","trekking_routes":18,"heritage_sites":7,"accommodation_units":1850},"geometry":{"type":"Polygon","coordinates":[[[83.0,27.8],[84.0,27.5],[84.5,27.8],[85.0,28.0],[84.8,28.5],[84.2,29.0],[83.8,29.2],[83.2,29.0],[82.8,28.7],[82.5,28.3],[83.0,27.8]]]}},
+    { "type":"Feature","properties":{"name":"Lumbini Province","province_no":5,"capital":"Butwal","tourist_density":95,"annual_visitors":420000,"top_attraction":"Lumbini (Birthplace of Buddha), Chitwan","trekking_routes":5,"heritage_sites":8,"accommodation_units":620},"geometry":{"type":"Polygon","coordinates":[[[82.0,27.2],[83.0,27.2],[83.0,27.8],[82.5,28.3],[82.0,28.5],[81.5,28.2],[81.0,27.9],[80.5,27.5],[80.5,27.0],[81.0,26.9],[82.0,27.0],[82.0,27.2]]]}},
+    { "type":"Feature","properties":{"name":"Karnali Province","province_no":6,"capital":"Birendranagar","tourist_density":18,"annual_visitors":65000,"top_attraction":"Rara Lake, Dolpo, Shey Phoksundo","trekking_routes":10,"heritage_sites":4,"accommodation_units":210},"geometry":{"type":"Polygon","coordinates":[[[80.5,28.5],[82.0,28.5],[82.5,28.3],[82.8,28.7],[83.2,29.0],[82.8,29.5],[82.0,30.0],[81.5,30.2],[80.8,30.0],[80.0,29.5],[79.8,28.8],[80.2,28.5],[80.5,28.5]]]}},
+    { "type":"Feature","properties":{"name":"Sudurpashchim Province","province_no":7,"capital":"Dhangadhi","tourist_density":22,"annual_visitors":78000,"top_attraction":"Api Nampa, Shuklaphanta Wildlife Reserve","trekking_routes":6,"heritage_sites":2,"accommodation_units":190},"geometry":{"type":"Polygon","coordinates":[[[79.5,28.5],[80.5,28.5],[80.2,28.5],[79.8,28.8],[80.0,29.5],[80.8,30.0],[80.5,30.5],[79.8,30.5],[79.2,30.0],[79.0,29.5],[78.8,28.8],[79.0,28.5],[79.5,28.5]]]}}
+  ]
+};
+
+// ─────────────────────────────────────────────
+//  TREKKING ROUTES GEOJSON (real GPS coords)
+// ─────────────────────────────────────────────
+const trekkingRoutes = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Everest Base Camp Trek",
+        "difficulty": "Strenuous",
+        "difficulty_color": "#e05a2b",
+        "days": "12–14 days",
+        "distance_km": 130,
+        "max_elevation": 5364,
+        "start": "Lukla",
+        "end": "Everest Base Camp",
+        "permit": "Sagarmatha National Park Permit",
+        "best_season": "Mar–May, Sep–Nov",
+        "province": "Koshi Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [86.7278,27.6869],[86.7150,27.7100],[86.7130,27.7310],
+          [86.7150,27.7620],[86.7220,27.7960],[86.7120,27.8220],
+          [86.7140,27.8560],[86.7230,27.8870],[86.7310,27.9150],
+          [86.7540,27.9390],[86.7620,27.9520],[86.8000,27.9800],
+          [86.8120,27.9960],[86.8500,28.0020]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Annapurna Circuit Trek",
+        "difficulty": "Moderate–Strenuous",
+        "difficulty_color": "#e8b84b",
+        "days": "14–21 days",
+        "distance_km": 220,
+        "max_elevation": 5416,
+        "start": "Besisahar",
+        "end": "Nayapul",
+        "permit": "ACAP Permit + TIMS",
+        "best_season": "Mar–May, Oct–Nov",
+        "province": "Gandaki Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [84.3780,28.2300],[84.3500,28.3200],[84.3300,28.4200],
+          [84.2800,28.5300],[84.2200,28.6200],[84.0800,28.6700],
+          [83.9600,28.7400],[83.8700,28.8200],[83.8200,28.9700],
+          [83.7600,29.0400],[83.7200,29.1200],[83.8000,29.1700],
+          [83.9100,29.1300],[83.9800,28.9600],[84.0300,28.8800],
+          [83.9700,28.8200],[83.8600,28.7100],[83.7800,28.6100],
+          [83.7500,28.5100],[83.7800,28.4200],[83.8200,28.3200],
+          [83.8600,28.2600],[83.9500,28.2100]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Langtang Valley Trek",
+        "difficulty": "Moderate",
+        "difficulty_color": "#4a7c59",
+        "days": "7–10 days",
+        "distance_km": 65,
+        "max_elevation": 4984,
+        "start": "Syabrubesi",
+        "end": "Kyanjin Gompa",
+        "permit": "Langtang National Park Permit",
+        "best_season": "Mar–May, Oct–Dec",
+        "province": "Bagmati Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [85.3500,28.1500],[85.3600,28.2000],[85.3700,28.2500],
+          [85.4000,28.3000],[85.4200,28.3500],[85.4500,28.3900],
+          [85.5000,28.4100],[85.5400,28.4200],[85.5700,28.4100],
+          [85.6100,28.4000],[85.6500,28.3900]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Manaslu Circuit Trek",
+        "difficulty": "Strenuous",
+        "difficulty_color": "#e05a2b",
+        "days": "14–18 days",
+        "distance_km": 177,
+        "max_elevation": 5160,
+        "start": "Soti Khola",
+        "end": "Dharapani",
+        "permit": "Manaslu Restricted Area Permit",
+        "best_season": "Sep–Nov, Mar–May",
+        "province": "Gandaki Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [84.6900,28.0800],[84.7200,28.1500],[84.7600,28.2200],
+          [84.8000,28.2900],[84.8100,28.3600],[84.7900,28.4300],
+          [84.7800,28.5200],[84.7200,28.5800],[84.6500,28.6200],
+          [84.5900,28.6900],[84.5200,28.7200],[84.4700,28.7600],
+          [84.4200,28.7800],[84.3200,28.7500],[84.2800,28.6900],
+          [84.2300,28.6300],[84.2100,28.5600],[84.2500,28.5000],
+          [84.2900,28.4400],[84.3300,28.4100]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ghorepani Poon Hill Trek",
+        "difficulty": "Easy–Moderate",
+        "difficulty_color": "#7aab8a",
+        "days": "4–5 days",
+        "distance_km": 50,
+        "max_elevation": 3210,
+        "start": "Nayapul",
+        "end": "Nayapul",
+        "permit": "ACAP Permit",
+        "best_season": "Year-round (best Feb–Mar for rhododendrons)",
+        "province": "Gandaki Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [83.9500,28.2100],[83.9100,28.2500],[83.8700,28.2900],
+          [83.8300,28.3400],[83.8100,28.3900],[83.8200,28.4400],
+          [83.8500,28.4000],[83.8900,28.3600],[83.9300,28.3100],
+          [83.9600,28.2700],[83.9500,28.2100]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Upper Mustang Trek",
+        "difficulty": "Moderate",
+        "difficulty_color": "#4a7c59",
+        "days": "10–14 days",
+        "distance_km": 120,
+        "max_elevation": 3840,
+        "start": "Jomsom",
+        "end": "Lo Manthang",
+        "permit": "Upper Mustang Restricted Area Permit (USD 500)",
+        "best_season": "May–Oct (rain shadow region)",
+        "province": "Gandaki Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [83.7200,28.7800],[83.7300,28.8500],[83.7400,28.9300],
+          [83.7500,29.0100],[83.7400,29.0900],[83.7200,29.1500],
+          [83.7000,29.2200],[83.7200,29.2900],[83.7400,29.3600],
+          [83.7600,29.4200],[83.7800,29.4800],[83.8000,29.5300],
+          [83.8200,29.5800],[83.8400,29.6300],[83.8600,29.6800],
+          [83.9000,29.7500],[83.9500,29.8200]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kanchenjunga Base Camp Trek",
+        "difficulty": "Strenuous",
+        "difficulty_color": "#e05a2b",
+        "days": "20–25 days",
+        "distance_km": 200,
+        "max_elevation": 5143,
+        "start": "Taplejung",
+        "end": "Kanchenjunga Base Camp",
+        "permit": "Kanchenjunga Conservation Area Permit",
+        "best_season": "Mar–May, Oct–Nov",
+        "province": "Koshi Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [87.6700,27.3500],[87.6900,27.4500],[87.7000,27.5500],
+          [87.7100,27.6400],[87.7300,27.7200],[87.7600,27.8000],
+          [87.7900,27.8700],[87.8200,27.9300],[87.8600,27.9800],
+          [87.9000,28.0200],[87.9200,28.0700],[87.9300,28.1000]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rara Lake Trek",
+        "difficulty": "Moderate",
+        "difficulty_color": "#4a7c59",
+        "days": "10–14 days",
+        "distance_km": 100,
+        "max_elevation": 3060,
+        "start": "Jumla",
+        "end": "Rara Lake",
+        "permit": "Rara National Park Permit",
+        "best_season": "Sep–Nov, Apr–Jun",
+        "province": "Karnali Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [82.1800,29.2700],[82.1500,29.3200],[82.1200,29.3800],
+          [82.0900,29.4400],[82.0600,29.5000],[82.0300,29.5500],
+          [82.0000,29.6000],[81.9700,29.6500],[81.9500,29.6900],
+          [81.9200,29.7200],[81.9000,29.7500]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dolpo Trek (Lower)",
+        "difficulty": "Strenuous",
+        "difficulty_color": "#e05a2b",
+        "days": "14–18 days",
+        "distance_km": 180,
+        "max_elevation": 5360,
+        "start": "Juphal",
+        "end": "Phoksundo Lake",
+        "permit": "Shey Phoksundo National Park Permit",
+        "best_season": "May–Oct",
+        "province": "Karnali Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [82.8400,28.9300],[82.8200,28.9800],[82.8000,29.0400],
+          [82.7800,29.1000],[82.7600,29.1600],[82.7400,29.2100],
+          [82.7200,29.2600],[82.7000,29.3100],[82.6800,29.3500],
+          [82.6600,29.3900],[82.6500,29.4200]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gosaikunda Trek",
+        "difficulty": "Moderate",
+        "difficulty_color": "#4a7c59",
+        "days": "5–7 days",
+        "distance_km": 55,
+        "max_elevation": 4380,
+        "start": "Dhunche",
+        "end": "Gosaikunda Lake",
+        "permit": "Langtang National Park Permit",
+        "best_season": "Mar–May, Sep–Nov",
+        "province": "Bagmati Province"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [85.3000,28.1000],[85.3100,28.1500],[85.3200,28.2000],
+          [85.3300,28.2500],[85.3400,28.3000],[85.3500,28.3500],
+          [85.3600,28.4000],[85.3700,28.4400],[85.3800,28.4800],
+          [85.3900,28.5200],[85.4000,28.5500]
+        ]
+      }
+    }
+  ]
+};
+
+// ─── CHOROPLETH CONFIG ───
+const touristLayer = {
+  attr: 'tourist_density',
+  label: 'Tourist Density (visitors per 100 km²)',
+  breaks: [20, 40, 80, 150, 250, 320],
+  colors: ['#0d2212','#1a4a2a','#2d7a45','#6aab60','#c8d84a','#f5e840']
+};
+
+// ─── MAP INIT ───
+const map = L.map('map', {
+  center: [28.2, 83.9],
+  zoom: 7,
+  zoomControl: true,
+  attributionControl: true
+});
+
+// Base tile layer — OpenTopoMap for terrain context
+const topoTile = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors, SRTM | Map style © OpenTopoMap (CC-BY-SA)',
+  maxZoom: 17,
+  opacity: 0.85
+});
+
+const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap contributors © CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+});
+
+darkTile.addTo(map);
+
+// ─── BIPAD WMS LAYER ───
+// BIPAD Portal GeoServer - hazard/flood risk overlay
+const bipadWMS = L.tileLayer.wms('https://geoserver.bipadportal.gov.np/geoserver/wms', {
+  layers: 'bipad:hazard_flood,bipad:hazard_landslide',
+  format: 'image/png',
+  transparent: true,
+  opacity: 0.45,
+  attribution: '© BIPAD Portal / NDRRMA Nepal',
+  version: '1.1.1',
+  errorTileUrl: ''
+});
+let bipadVisible = false;
+
+// ─── MINI MAP ───
+let miniMap = null;
+let miniGeoLayer = null;
+
+function initMiniMap() {
+  if (miniMap) return;
+  miniMap = L.map('mini-map', {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    touchZoom: false
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(miniMap);
+}
+
+function updateMiniMap(feature) {
+  initMiniMap();
+  document.getElementById('mini-map-wrap').style.display = 'block';
+  if (miniGeoLayer) { miniMap.removeLayer(miniGeoLayer); miniGeoLayer = null; }
+  miniGeoLayer = L.geoJSON(feature, {
+    style: feature.geometry.type === 'LineString' ? {
+      color: feature.properties.difficulty_color || '#e8b84b',
+      weight: 3, opacity: 1
+    } : {
+      fillColor: getColor(feature.properties.tourist_density),
+      fillOpacity: 0.75, color: '#c9a84c', weight: 2
+    }
+  }).addTo(miniMap);
+  miniMap.fitBounds(miniGeoLayer.getBounds(), { padding: [10, 10] });
+  setTimeout(() => miniMap.invalidateSize(), 50);
+}
+
+function hideMiniMap() {
+  document.getElementById('mini-map-wrap').style.display = 'none';
+}
+
+// ─── CHOROPLETH HELPERS ───
+function getColor(val) {
+  const { breaks, colors } = touristLayer;
+  for (let i = 0; i < breaks.length; i++) {
+    if (val <= breaks[i]) return colors[i];
+  }
+  return colors[colors.length - 1];
+}
+
+function provinceStyle(feature) {
+  return {
+    fillColor: getColor(feature.properties.tourist_density),
+    weight: 1.5, opacity: 1,
+    color: 'rgba(184,212,192,0.4)',
+    fillOpacity: 0.72
+  };
+}
+
+// ─── ROUTE STYLE ───
+function routeStyle(feature) {
+  return {
+    color: feature.properties.difficulty_color,
+    weight: 3,
+    opacity: 0.9,
+    dashArray: feature.properties.difficulty === 'Easy–Moderate' ? '6,4' : null
+  };
+}
+
+// ─── LAYERS ───
+let provinceLayer = null;
+let routeLayer = null;
+let currentView = 'tourist';
+
+function onProvinceHover(e) {
+  e.target.setStyle({ weight: 2.5, color: '#c9a84c', fillOpacity: 0.9 });
+  e.target.bringToFront();
+  const p = e.target.feature.properties;
+  const color = getColor(p.tourist_density);
+  document.getElementById('info-panel').innerHTML = `
+    <div style="border-left:3px solid ${color};padding-left:0.7rem;margin-bottom:0.8rem;">
+      <div class="info-province-name">${p.name}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--sage);letter-spacing:0.1em">Province No. ${p.province_no} · ${p.capital}</div>
+    </div>
+    <div class="info-row"><span class="info-key">Tourist Density</span><span class="info-val highlight">${p.tourist_density} /100km²</span></div>
+    <div class="info-row"><span class="info-key">Annual Visitors</span><span class="info-val">${p.annual_visitors.toLocaleString()}</span></div>
+    <div class="info-row"><span class="info-key">Top Attraction</span><span class="info-val" style="font-size:0.6rem;text-align:right;max-width:130px;line-height:1.3">${p.top_attraction}</span></div>
+    <div class="info-row"><span class="info-key">Trekking Routes</span><span class="info-val">${p.trekking_routes}</span></div>
+    <div class="info-row"><span class="info-key">Heritage Sites</span><span class="info-val">${p.heritage_sites}</span></div>
+    <div class="info-row"><span class="info-key">Accommodation</span><span class="info-val">${p.accommodation_units} units</span></div>
+  `;
+  updateMiniMap(e.target.feature);
+}
+
+function onProvinceOut(e) {
+  if (provinceLayer) provinceLayer.resetStyle(e.target);
+  document.getElementById('info-panel').innerHTML = '<div class="info-default">Hover over a province or trekking route</div>';
+  hideMiniMap();
+}
+
+function onRouteHover(e) {
+  e.target.setStyle({ weight: 5, opacity: 1 });
+  e.target.bringToFront();
+  const p = e.target.feature.properties;
+  document.getElementById('info-panel').innerHTML = `
+    <div style="border-left:3px solid ${p.difficulty_color};padding-left:0.7rem;margin-bottom:0.8rem;">
+      <div class="info-province-name" style="font-size:1rem">${p.name}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:${p.difficulty_color};letter-spacing:0.1em">${p.difficulty}</div>
+    </div>
+    <div class="info-row"><span class="info-key">Duration</span><span class="info-val highlight">${p.days}</span></div>
+    <div class="info-row"><span class="info-key">Distance</span><span class="info-val">${p.distance_km} km</span></div>
+    <div class="info-row"><span class="info-key">Max Elevation</span><span class="info-val">${p.max_elevation.toLocaleString()} m</span></div>
+    <div class="info-row"><span class="info-key">Start</span><span class="info-val">${p.start}</span></div>
+    <div class="info-row"><span class="info-key">End</span><span class="info-val">${p.end}</span></div>
+    <div class="info-row"><span class="info-key">Permit</span><span class="info-val" style="font-size:0.58rem;text-align:right;max-width:130px;line-height:1.3">${p.permit}</span></div>
+    <div class="info-row"><span class="info-key">Best Season</span><span class="info-val" style="font-size:0.6rem;text-align:right;max-width:130px">${p.best_season}</span></div>
+    <div class="info-row"><span class="info-key">Province</span><span class="info-val">${p.province}</span></div>
+  `;
+  updateMiniMap(e.target.feature);
+}
+
+function onRouteOut(e) {
+  if (routeLayer) routeLayer.resetStyle(e.target);
+  document.getElementById('info-panel').innerHTML = '<div class="info-default">Hover over a province or trekking route</div>';
+  hideMiniMap();
+}
+
+function buildProvinceLayer() {
+  return L.geoJSON(provincesGeoJSON, {
+    style: provinceStyle,
+    onEachFeature: (feature, layer) => {
+      layer.on({ mouseover: onProvinceHover, mouseout: onProvinceOut, click: onProvinceHover });
+    }
+  });
+}
+
+function buildRouteLayer() {
+  return L.geoJSON(trekkingRoutes, {
+    style: routeStyle,
+    onEachFeature: (feature, layer) => {
+      layer.on({ mouseover: onRouteHover, mouseout: onRouteOut, click: onRouteHover });
+    }
+  });
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.db-btn').forEach(b => {
+    if (b.id === 'btn-bipad') return;
+    b.classList.remove('active');
+  });
+  document.getElementById('btn-' + view).classList.add('active');
+
+  // Remove existing layers
+  if (provinceLayer) { map.removeLayer(provinceLayer); provinceLayer = null; }
+  if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+
+  if (view === 'tourist') {
+    provinceLayer = buildProvinceLayer().addTo(map);
+    updateLegend('tourist');
+    map.setView([28.2, 83.9], 7);
+  } else if (view === 'routes') {
+    // Show faint province base + routes on top
+    provinceLayer = buildProvinceLayer().addTo(map);
+    routeLayer = buildRouteLayer().addTo(map);
+    updateLegend('routes');
+    map.setView([28.5, 84.0], 7);
+  }
+
+  document.getElementById('info-panel').innerHTML = '<div class="info-default">Hover over a province or trekking route</div>';
+  hideMiniMap();
+}
+
+function toggleBIPAD(btn) {
+  bipadVisible = !bipadVisible;
+  if (bipadVisible) {
+    map.addLayer(bipadWMS);
+    btn.classList.add('active');
+    btn.textContent = 'BIPAD ✓';
+  } else {
+    map.removeLayer(bipadWMS);
+    btn.classList.remove('active');
+    btn.textContent = 'BIPAD Hazard';
+  }
+}
+
+function updateLegend(type) {
+  let html = '';
+  if (type === 'tourist') {
+    const { breaks, colors, label } = touristLayer;
+    html += `<div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--sage);letter-spacing:0.12em;margin-bottom:0.5rem;text-transform:uppercase;">${label}</div>`;
+    for (let i = 0; i < colors.length; i++) {
+      const low = i === 0 ? 0 : breaks[i-1];
+      const high = breaks[i];
+      html += `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0;">
+        <div style="width:16px;height:16px;background:${colors[i]};border:1px solid rgba(255,255,255,0.15);flex-shrink:0;"></div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:#b8d4c0;">${low} – ${high}</span>
+      </div>`;
+    }
+    html += `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0;">
+      <div style="width:16px;height:16px;background:${colors[colors.length-1]};border:1px solid rgba(255,255,255,0.15);flex-shrink:0;"></div>
+      <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:#b8d4c0;">&gt; ${breaks[breaks.length-1]}</span>
+    </div>`;
+  } else if (type === 'routes') {
+    html += `<div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--sage);letter-spacing:0.12em;margin-bottom:0.5rem;text-transform:uppercase;">Route Difficulty</div>`;
+    const difficulties = [
+      { label: 'Easy – Moderate', color: '#7aab8a' },
+      { label: 'Moderate', color: '#4a7c59' },
+      { label: 'Mod – Strenuous', color: '#e8b84b' },
+      { label: 'Strenuous', color: '#e05a2b' }
+    ];
+    difficulties.forEach(d => {
+      html += `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0;">
+        <div style="width:24px;height:4px;background:${d.color};flex-shrink:0;border-radius:2px;"></div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:#b8d4c0;">${d.label}</span>
+      </div>`;
+    });
+    html += `<div style="margin-top:0.6rem;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--sage);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.3rem;">Tourist Density Base</div>`;
+    const { breaks, colors } = touristLayer;
+    for (let i = 0; i < 3; i++) {
+      html += `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.15rem 0;">
+        <div style="width:16px;height:16px;background:${colors[i*2]};border:1px solid rgba(255,255,255,0.1);flex-shrink:0;"></div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.58rem;color:#6b6b5e;">Low / Mid / High density</span>
+      </div>`;
+      break;
+    }
+  }
+  document.getElementById('legend-items').innerHTML = html;
+}
+
+// ─── INIT ───
+setView('tourist');
+</script>
+
+</html>
+</script>
+</body>
+</html>
